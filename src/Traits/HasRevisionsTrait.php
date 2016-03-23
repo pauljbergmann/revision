@@ -187,6 +187,8 @@ trait HasRevisionsTrait
         // Construct a new revision model instance.
         $revision = $this->revisions()->getRelated()->newInstance();
 
+        // We'll set all the revision attributes manually in case
+        // the fields aren't fillable on the model.
         $revision->revisionable_type = get_class($this);
         $revision->revisionable_id = $this->getKey();
         $revision->user_id = $this->revisionUserId();
