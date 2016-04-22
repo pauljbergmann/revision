@@ -32,18 +32,7 @@ class RevisionTest extends FunctionalTestCase
 
         $revisions = Revision::all();
 
-        $this->assertEquals(5, $revisions->count());
-
-        $idRevision = $revisions->get(0);
-
-        $this->assertEquals(Post::class, $idRevision->revisionable_type);
-        $this->assertEquals(1, $idRevision->revisionable_id);
-        $this->assertEquals('id', $idRevision->key);
-        $this->assertNull($idRevision->old_value);
-
-        // Test Revision User
-        $this->assertEquals(1, $idRevision->user_id);
-        $this->assertInstanceOf(User::class, $idRevision->getUserResponsible());
+        $this->assertEquals(0, $revisions->count());
     }
 
     public function testModify()
@@ -58,9 +47,9 @@ class RevisionTest extends FunctionalTestCase
         $post->save();
 
         $revisions = Revision::all();
-        $this->assertEquals(6, $revisions->count());
+        $this->assertEquals(1, $revisions->count());
 
-        $titleRevision = $revisions->get(5);
+        $titleRevision = $revisions->get(0);
 
         $this->assertEquals('title', $titleRevision->key);
         $this->assertEquals('Test', $titleRevision->old_value);
@@ -76,12 +65,15 @@ class RevisionTest extends FunctionalTestCase
         $post->description = 'Testing';
         $post->save();
 
+        $post->title = 'Changed';
+        $post->save();
+
         $revisions = Revision::all();
 
         $this->assertEquals(1, $revisions->count());
         $this->assertEquals('title', $revisions->get(0)->key);
-        $this->assertEquals('Testing', $revisions->get(0)->new_value);
-        $this->assertNull($revisions->get(0)->old_value);
+        $this->assertEquals('Changed', $revisions->get(0)->new_value);
+        $this->assertEquals('Testing', $revisions->get(0)->old_value);
     }
 
     public function testAvoidColumns()
@@ -93,13 +85,10 @@ class RevisionTest extends FunctionalTestCase
         $post->description = 'Testing';
         $post->save();
 
-        $revisions = Revision::all();
+        $post->title = 'New Title';
+        $post->save();
 
-        $this->assertEquals(4, $revisions->count());
-        $this->assertEquals('id', $revisions->get(0)->key);
-        $this->assertEquals('description', $revisions->get(1)->key);
-        $this->assertEquals('created_at', $revisions->get(2)->key);
-        $this->assertEquals('updated_at', $revisions->get(3)->key);
+        $this->assertEquals(0, Revision::all()->count());
     }
 
     public function testColumnFormatting()
@@ -110,13 +99,14 @@ class RevisionTest extends FunctionalTestCase
         $post->description = 'Testing';
         $post->save();
 
+        $post->title = 'Changed';
+        $post->description = 'Changed';
+        $post->save();
+
         $revisions = $post->revisions;
 
-        $this->assertEquals('ID', $revisions->get(0)->getColumnName());
-        $this->assertEquals('Post Title', $revisions->get(1)->getColumnName());
-        $this->assertEquals('Post Description', $revisions->get(2)->getColumnName());
-        $this->assertEquals('Created', $revisions->get(3)->getColumnName());
-        $this->assertEquals('Updated', $revisions->get(4)->getColumnName());
+        $this->assertEquals('Post Title', $revisions->get(0)->getColumnName());
+        $this->assertEquals('Post Description', $revisions->get(1)->getColumnName());
     }
 
     public function testColumnMeans()
@@ -128,9 +118,16 @@ class RevisionTest extends FunctionalTestCase
         $post->description = 'Testing';
         $post->save();
 
+        $user = new User();
+        $user->username = 'User Two';
+        $user->save();
+
+        $post->user_id = $user->id;
+        $post->save();
+
         $revisions = $post->revisions;
 
-        $this->assertEquals('User One', $revisions->get(0)->getNewValue());
+        $this->assertEquals('User Two', $revisions->get(0)->getNewValue());
     }
 
     public function testGetRevisionColumnsFormatted()
@@ -163,9 +160,11 @@ class RevisionTest extends FunctionalTestCase
     {
         $post = new Post();
 
-        $post->user_id = $this->user->id;
         $post->title = 'Testing';
         $post->description = 'Testing';
+        $post->save();
+
+        $post->user_id = $this->user->id;
         $post->save();
 
         $revisions = $post->revisions;

@@ -35,8 +35,8 @@ trait HasRevisionsTrait
      */
     public static function bootHasRevisionsTrait()
     {
-        static::saved(function(Model $model) {
-            $model->afterSave();
+        static::updated(function(Model $model) {
+            $model->afterUpdate();
         });
     }
 
@@ -45,7 +45,7 @@ trait HasRevisionsTrait
      *
      * @return void
      */
-    public function afterSave()
+    public function afterUpdate()
     {
         array_map(function ($column) {
             if($this->isDirty($column)) {
