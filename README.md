@@ -186,7 +186,7 @@ echo $revision->getNewValue(); // Returns string
 
 // In your `post.show` view:
 
-```php
+```html
 @if($post->revisions->count() > 0)
     
      <table class="table table-striped">
