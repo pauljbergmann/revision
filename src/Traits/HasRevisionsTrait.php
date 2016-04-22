@@ -73,8 +73,8 @@ trait HasRevisionsTrait
         $columns = $this->getRevisionColumns();
 
         foreach($columns as $column) {
-            // Make sure the column exists inside the original attributes array
-            if(array_key_exists($column, $this->revisionOriginalAttributes)) {
+            // Make sure the column exists inside the original attributes array.
+            if($this->isDirty($column) && array_key_exists($column, $this->revisionOriginalAttributes)) {
                 $originalValue = $this->revisionOriginalAttributes[$column];
 
                 // Only create a new revision record if the value has changed
@@ -182,7 +182,7 @@ trait HasRevisionsTrait
      *
      * @return bool|Model
      */
-    private function processCreateRevisionRecord($key, $oldValue, $newValue)
+    protected function processCreateRevisionRecord($key, $oldValue, $newValue)
     {
         // Construct a new revision model instance.
         $revision = $this->revisions()->getRelated()->newInstance();
