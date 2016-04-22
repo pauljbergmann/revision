@@ -29,38 +29,13 @@ trait HasRevisionsTrait
     abstract public function revisionUserId();
 
     /**
-     * The original model attributes
-     * before it has been saved.
-     *
-     * @var array
-     */
-    private $revisionOriginalAttributes = [];
-
-    /**
      * The trait boot method.
      */
     public static function bootHasRevisionsTrait()
     {
-        static::saving(function(Model $model) {
-            $model->beforeSave();
-        });
-
         static::saved(function(Model $model) {
             $model->afterSave();
         });
-    }
-
-    /**
-     * Retrieves the models original attributes
-     * before the model has been saved.
-     */
-    public function beforeSave()
-    {
-        $columns = $this->getRevisionColumns();
-
-        foreach($columns as $column) {
-            $this->revisionOriginalAttributes[$column] = $this->getOriginal($column);
-        }
     }
 
     /**
@@ -74,20 +49,11 @@ trait HasRevisionsTrait
 
         foreach($columns as $column) {
             // Make sure the column exists inside the original attributes array.
-            if($this->isDirty($column) && array_key_exists($column, $this->revisionOriginalAttributes)) {
-                $originalValue = $this->revisionOriginalAttributes[$column];
+            if($this->isDirty($column)) {
+                $old = $this->getOriginal($column);
+                $new = $this->getAttribute($column);
 
-                // Only create a new revision record if the value has changed
-                if($originalValue != $this->getAttribute($column)) {
-                    // Retrieve the old value from the original attributes property.
-                    $oldValue = array_get($this->revisionOriginalAttributes, $column);
-
-                    // Retrieve the new value from the current attributes.
-                    $newValue = $this->getAttribute($column);
-
-                    // Create a new revision record.
-                    $this->processCreateRevisionRecord($column, $oldValue, $newValue);
-                }
+                $this->processCreateRevisionRecord($column, $old, $new);
             }
         }
     }
