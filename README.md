@@ -24,89 +24,66 @@ You're all set!
 
 Create the `Revision` model and insert the `belongsTo()` or `hasOne()` `user()` relationship as well as the `RevisionTrait`:
 
-    namespace App\Models;
+```php
+namespace App\Models;
+
+use Stevebauman\Revision\Traits\RevisionTrait;
+
+class Revision extends Eloquent
+{
+    use RevisionTrait;
     
-    use Stevebauman\Revision\Traits\RevisionTrait;
+    /**
+     * The revisions table.
+     *
+     * @var string
+     */
+    protected $table = 'revisions';
     
-    class Revision extends Eloquent
+    /**
+     * The belongs to user relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
     {
-        use RevisionTrait;
-    
-        protected $table = 'revisions';
-        
-        public function user()
-        {
-            return $this->belongsTo('App\Models\User');
-        }
+        return $this->belongsTo('App\Models\User');
     }
+}
+```
 
 Insert the `Stevebauman\Revision\Traits\HasRevisionsTrait` onto your base model:
+
+```php
+namespace App\Models;
+
+use Stevebauman\Revision\Traits\HasRevisionsTrait;
+
+class BaseModel extends Eloquent
+{
+    use HasRevisionsTrait;
     
-    namespace App\Models;
-    
-    use Stevebauman\Revision\Traits\HasRevisionsTrait;
-    
-    class BaseModel extends Eloquent
+    /**
+     * The morphMany revisions relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function revisions()
     {
-        use HasRevisionsTrait;
-        
-        public function revisions()
-        {
-            return $this->morphMany('Stevebauman\Revision\Models\Revision', 'revisionable');
-        }
-
-
-        public function revisionUserId()
-        {
-            return $this->revisionUser->id;
-        }
+        return $this->morphMany('App\Models\Revision', 'revisionable');
     }
-
-The trait includes 3 (three) abstract methods that you must implement in your base model (shown above). This allows you to use your
- own revision model, as well as your own user model. If you'd like to supply your own Revision model, create one and insert it into
- the base models `revisions()` relationship like so:
-
-Your `Revision` model:
     
-    namespace App\Models;
-    
-    use Stevebauman\Revision\Traits\RevisionTrait;
-    
-    class Revision extends Eloquent
+    /**
+     * The current users ID for storage in revisions.
+     *
+     * @return int|string
+     */
+    public function revisionUserId()
     {
-        use RevisionTrait;
-    
-        protected $table = 'revisions';
+        return Auth::id();
     }
-
-Your `BaseModel`:
-
-    use Stevebauman\Revision\Traits\HasRevisionsTrait;
-        
-    class BaseModel extends Eloquent
-    {
-        use HasRevisionsTrait;
-        
-        /**
-         * The morphMany revisions relationship.
-         *
-         * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-         */
-        public function revisions()
-        {
-            return $this->morphMany('App\Models\Revision', 'revisionable');
-        }
-        
-        /**
-         * The current users ID for storage in revisions.
-         *
-         * @return int|string
-         */
-        public function revisionUserId()
-        {
-            return Auth::id();
-        }
-    }
+}
+```
 
 ### Usage
 
