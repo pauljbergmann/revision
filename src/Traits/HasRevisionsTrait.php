@@ -123,7 +123,7 @@ trait HasRevisionsTrait
             // the column is equal to the star character,
             // we'll retrieve all the attribute keys
             // indicating the table columns.
-             $columns = Schema::getColumnListing($this->getTable());
+            $columns = Schema::getColumnListing($this->getTable());
         }
 
         // Filter the returned columns by the columns to avoid
@@ -142,29 +142,33 @@ trait HasRevisionsTrait
      * Creates a new revision record.
      *
      * @param string|int $key
-     * @param mixed      $oldValue
-     * @param mixed      $newValue
+     * @param mixed      $old
+     * @param mixed      $new
      *
-     * @return bool|Model
+     * @return Model
      */
-    protected function processCreateRevisionRecord($key, $oldValue, $newValue)
+    protected function processCreateRevisionRecord($key, $old, $new)
     {
-        // Construct a new revision model instance.
-        $revision = $this->revisions()->getRelated()->newInstance();
+        $attributes = [
+            'revisionable_type' => self::class,
+            'revisionable_id'   => $this->getKey(),
+            'user_id'           => $this->revisionUserId(),
+            'key'               => $key,
+            'old_value'         => $old,
+            'new_value'         => $new,
+        ];
 
-        // We'll set all the revision attributes manually in case
-        // the fields aren't fillable on the model.
-        $revision->revisionable_type = get_class($this);
-        $revision->revisionable_id = $this->getKey();
-        $revision->user_id = $this->revisionUserId();
-        $revision->key = $key;
-        $revision->old_value = $oldValue;
-        $revision->new_value = $newValue;
+        $model = $this->revisions()->where($attributes)->first();
 
-        if($revision->save()) {
-            return $revision;
+        if (!$model) {
+            $model = $this->revisions()
+                ->getRelated()
+                ->newInstance()
+                ->forceFill($attributes);
+
+            $model->save();
         }
 
-        return false;
+        return $model;
     }
 }
