@@ -86,7 +86,7 @@ trait RevisionTrait
 
         $value = $this->$valueKey;
 
-        // Check if the column key is inside the column means property array
+        // Check if the column key is inside the column means property array.
         if($means = $this->getColumnMeans($this->key, $model)) {
             return $this->getColumnMeansProperty($means, $model, $value);
         }
@@ -132,7 +132,7 @@ trait RevisionTrait
         // Assign a temporary object to the specified model.
         $tmpStr = $model;
 
-        // Go through each attribute
+        // Go through each attribute.
         foreach ($attributes as $attribute) {
             if ($attribute === end($attributes)) {
                 // If we're at the end of the attributes array,

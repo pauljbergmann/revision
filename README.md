@@ -54,11 +54,7 @@ Insert the `Stevebauman\Revision\Traits\HasRevisionsTrait` onto your base model:
         {
             return $this->morphMany('Stevebauman\Revision\Models\Revision', 'revisionable');
         }
-        
-        public function revisionUser()
-        {
-            return $this->hasOne('App\Models\User');
-        }
+
 
         public function revisionUserId()
         {
@@ -91,19 +87,24 @@ Your `BaseModel`:
     {
         use HasRevisionsTrait;
         
+        /**
+         * The morphMany revisions relationship.
+         *
+         * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+         */
         public function revisions()
         {
             return $this->morphMany('App\Models\Revision', 'revisionable');
         }
-    
-        public function revisionUser()
-        {
-            return $this->hasOne('App\Models\User');
-        }
-    
+        
+        /**
+         * The current users ID for storage in revisions.
+         *
+         * @return int|string
+         */
         public function revisionUserId()
         {
-            return $this->revisionUser->id;
+            return Auth::id();
         }
     }
 
