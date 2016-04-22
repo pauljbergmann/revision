@@ -30,6 +30,8 @@ trait HasRevisionsTrait
 
     /**
      * The trait boot method.
+     *
+     * @return void
      */
     public static function bootHasRevisionsTrait()
     {
@@ -39,23 +41,20 @@ trait HasRevisionsTrait
     }
 
     /**
-     * Retrieves the models updated attributes
-     * and saves the changes in a revision record
-     * per revision column.
+     * Creates a revision record on the models save event.
+     *
+     * @return void
      */
     public function afterSave()
     {
-        $columns = $this->getRevisionColumns();
-
-        foreach($columns as $column) {
-            // Make sure the column exists inside the original attributes array.
+        array_map(function ($column) {
             if($this->isDirty($column)) {
                 $old = $this->getOriginal($column);
                 $new = $this->getAttribute($column);
 
                 $this->processCreateRevisionRecord($column, $old, $new);
             }
-        }
+        }, $this->getRevisionColumns());
     }
 
     /**
