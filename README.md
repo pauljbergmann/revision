@@ -102,8 +102,11 @@ To track all changes on every column on the models database table, use an asteri
 ```php
 class Post extends BaseModel
 {
-    protected $table = 'posts';
-    
+    /**
+     * The columns to keep revisions of.
+     *
+     * @return int
+     */
     protected $revisionColumns = ['*'];
 }
 ```
