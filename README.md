@@ -11,7 +11,7 @@
 Insert Revision in your `composer.json` file:
 
 ```json
-"stevebauman/revision": "1.1.*"
+"stevebauman/revision": "1.2.*"
 ```
 
 Now run `composer update`. Once that's complete, insert the Revision service provider inside your `config/app.php` file:
