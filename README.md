@@ -6,6 +6,8 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/stevebauman/revision.svg?style=flat-square)](https://packagist.org/packages/stevebauman/revision)
 [![License](https://img.shields.io/packagist/l/stevebauman/revision.svg?style=flat-square)](https://packagist.org/packages/stevebauman/revision)
 
+Easily track any changes to an eloquent model.
+
 ### Installation
 
 Insert Revision in your `composer.json` file:
