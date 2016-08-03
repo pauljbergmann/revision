@@ -24,7 +24,7 @@ trait RevisionTrait
     }
 
     /**
-     * Returns the user responsible
+     * Returns the user responsible for the revision.
      *
      * @return mixed
      */
