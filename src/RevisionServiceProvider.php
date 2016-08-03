@@ -15,7 +15,7 @@ class RevisionServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/Migrations' => database_path('/migrations'),
-        ], 'migrations');
+        ], 'revision');
     }
 
     /**
