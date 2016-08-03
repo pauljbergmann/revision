@@ -190,9 +190,9 @@ echo $revision->getNewValue(); // Returns string
 
 ###### Example
 
+```html
 // In your `post.show` view:
 
-```html
 @if($post->revisions->count() > 0)
     
      <table class="table table-striped">
@@ -250,6 +250,11 @@ echo $revision->getNewValue(); // Returns string
 To change the display of your column name that has been revised, insert the property `$revisionColumnsFormatted` on your model:
 
 ```php
+/**
+ * The formatted revised column names.
+ *
+ * @var array
+ */
 protected $revisionColumnsFormatted = [
     'user_id' => 'User',
     'title' => 'Post Title',
@@ -263,6 +268,11 @@ To change the display of your values that have been revised, insert the property
 dot notation syntax to indicate relationship values. For example:
 
 ```php
+/**
+ * The formatted revised column names.
+ *
+ * @var array
+ */
 protected $revisionColumnsMean = [
     'user_id' => 'user.full_name',
 ];
