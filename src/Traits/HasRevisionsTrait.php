@@ -49,10 +49,11 @@ trait HasRevisionsTrait
     {
         array_map(function ($column) {
             if($this->isDirty($column)) {
-                $old = $this->getOriginal($column);
-                $new = $this->getAttribute($column);
-
-                $this->processCreateRevisionRecord($column, $old, $new);
+                $this->processCreateRevisionRecord(
+                    $column,
+                    $this->getOriginal($column),
+                    $this->getAttribute($column)
+                );
             }
         }, $this->getRevisionColumns());
     }
