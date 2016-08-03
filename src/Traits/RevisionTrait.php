@@ -102,7 +102,7 @@ trait RevisionTrait
      * @param int|string $key
      * @param Model      $model
      *
-     * @return bool|string
+     * @return string|bool
      */
     protected function getColumnMeans($key, Model $model)
     {
@@ -139,7 +139,6 @@ trait RevisionTrait
                 // through the mutator and pass on the
                 // revised value.
                 if($model->hasGetMutator($attribute)) {
-
                     $model = $model->mutateAttribute($attribute, $value);
                 } else {
                     // Looks like the relationship model doesn't
@@ -147,7 +146,6 @@ trait RevisionTrait
                     // return the models attribute.
                     $model = $model->{$attribute};
                 }
-
             } else {
                 $model = $model->{$attribute};
             }
