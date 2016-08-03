@@ -51,7 +51,7 @@ class Revision extends Eloquent
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(App\User::class);
     }
 }
 ```
@@ -74,7 +74,7 @@ class BaseModel extends Eloquent
      */
     public function revisions()
     {
-        return $this->morphMany('App\Models\Revision', 'revisionable');
+        return $this->morphMany(App\Revision::class, 'revisionable');
     }
     
     /**
@@ -84,7 +84,7 @@ class BaseModel extends Eloquent
      */
     public function revisionUserId()
     {
-        return Auth::id();
+        return auth()->id();
     }
 }
 ```
@@ -105,7 +105,7 @@ class Post extends BaseModel
     /**
      * The columns to keep revisions of.
      *
-     * @return int
+     * @var array
      */
     protected $revisionColumns = ['*'];
 }
@@ -117,9 +117,12 @@ To track changes on specific columns, insert the column names you'd like to trac
 
 ```php
 class Post extends BaseModel
-{
-    protected $table = 'posts';
-    
+{    
+    /**
+     * The columns to keep revisions of.
+     *
+     * @var array
+     */
     protected $revisionColumns = [
         'user_id',
         'title', 
@@ -134,7 +137,7 @@ To display your revisions on a record, call the relationship accessor `revisions
 a regular Laravel relationship, so you can eager load / lazy load your revisions as you please:
 
 ```php
-$post = Post::with(['revisions'])->find(1);
+$post = Post::with('revisions')->find(1);
 
 return view('post.show', ['post' => $post]);
 ```
@@ -194,35 +197,49 @@ echo $revision->getNewValue(); // Returns string
     
      <table class="table table-striped">
      
-            <thead>
-                <tr>
-                    <th>User Responsible</th>
-                    <th>Changed</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>On</th>
-                </tr>
-            </thead>
+        <thead>
+            <tr>
+                <th>User Responsible</th>
+                <th>Changed</th>
+                <th>From</th>
+                <th>To</th>
+                <th>On</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+        
+        @foreach($post->revisions as $revision)
+        
+            <tr>
             
-            <tbody>
-            @foreach($post->revisions as $revision)
-                <tr>
-                    <td>{{ $revision->getUserResponsible()->first_name }} {{ $record->getUserResponsible()->last_name }}</td>
-                    <td>{{ $revision->getColumnName() }}</td>
-                    <td>
-                        @if(is_null($revision->getOldValue()))
-                            <em>None</em>
-                        @else
-                            {{ $revision->getOldValue() }}
-                        @endif
-                    </td>
-                    <td>{{ $revision->getNewValue() }}</td>
-                    <td>{{ $revision->created_at }}</td>
-                </tr>
-            @endforeach
-            </tbody>
+                <td>
+                    {{ $revision->getUserResponsible()->first_name }}
+                    
+                    {{ $record->getUserResponsible()->last_name }}
+                </td>
+                
+                <td>{{ $revision->getColumnName() }}</td>
+                
+                <td>
+                    @if(is_null($revision->getOldValue()))
+                        <em>None</em>
+                    @else
+                        {{ $revision->getOldValue() }}
+                    @endif
+                </td>
+                
+                <td>{{ $revision->getNewValue() }}</td>
+                
+                <td>{{ $revision->created_at }}</td>
+                
+            </tr>
             
-        </table>
+        @endforeach
+        
+        </tbody>
+            
+    </table>
 @else
     <h5>There are no revisions to display.</h5>
 @endif
@@ -230,7 +247,7 @@ echo $revision->getNewValue(); // Returns string
 
 #### Modifying the display of column names
 
-To change the display of your column name that is revisioned, insert the property `$revisionColumnsFormatted` on your model:
+To change the display of your column name that has been revised, insert the property `$revisionColumnsFormatted` on your model:
 
 ```php
 protected $revisionColumnsFormatted = [
@@ -242,7 +259,7 @@ protected $revisionColumnsFormatted = [
 
 #### Modifying the display of values
 
-To change the display of your values that have been revisioned, insert the property `$revisionColumnsMean`. You can use
+To change the display of your values that have been revised, insert the property `$revisionColumnsMean`. You can use
 dot notation syntax to indicate relationship values. For example:
 
 ```php
