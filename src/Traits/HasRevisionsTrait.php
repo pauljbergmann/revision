@@ -103,6 +103,8 @@ trait HasRevisionsTrait
     public function setRevisionColumnsToAvoid(array $columns = [])
     {
         if(property_exists($this, 'revisionColumnsToAvoid')) {
+            // We'll check if the property exists so we don't assign
+            // a non-existent column on the revision model.
             $this->revisionColumnsToAvoid = $columns;
         }
 
@@ -116,25 +118,20 @@ trait HasRevisionsTrait
      */
     protected function getRevisionColumns()
     {
-        $columns = (is_array($this->revisionColumns) ? $this->revisionColumns : []);
+        $columns = is_array($this->revisionColumns) ? $this->revisionColumns : [];
 
-        if(count($columns) === 1 && $columns[0] === '*') {
-            // If the amount of columns is equal to one, and
-            // the column is equal to the star character,
-            // we'll retrieve all the attribute keys
-            // indicating the table columns.
+        if(isset($columns[0]) && $columns[0] === '*') {
+            // If we're given a wildcard, we'll retrieve
+            // all columns to create revisions on.
             $columns = Schema::getColumnListing($this->getTable());
         }
 
-        // Filter the returned columns by the columns to avoid
+        // Filter the returned columns by the columns to avoid.
         return array_filter($columns, function($column) {
-            $columnsToAvoid = $this->revisionColumnsToAvoid;
+            $columnsToAvoid = is_array($this->revisionColumnsToAvoid) ?
+                $this->revisionColumnsToAvoid : [];
 
-            if(is_array($columnsToAvoid) && count($columnsToAvoid) > 0) {
-                if(in_array($column, $columnsToAvoid)) return false;
-            }
-
-            return $column;
+            return ! in_array($column, $columnsToAvoid);
         });
     }
 
@@ -158,16 +155,12 @@ trait HasRevisionsTrait
             'new_value'         => $new,
         ];
 
-        $model = $this->revisions()->where($attributes)->first();
+        $model = $this->revisions()
+            ->getRelated()
+            ->newInstance()
+            ->forceFill($attributes);
 
-        if (!$model) {
-            $model = $this->revisions()
-                ->getRelated()
-                ->newInstance()
-                ->forceFill($attributes);
-
-            $model->save();
-        }
+        $model->save();
 
         return $model;
     }

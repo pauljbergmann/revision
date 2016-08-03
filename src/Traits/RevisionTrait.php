@@ -24,7 +24,7 @@ trait RevisionTrait
     }
 
     /**
-     * Returns the revision user object.
+     * Returns the user responsible
      *
      * @return mixed
      */
@@ -74,17 +74,17 @@ trait RevisionTrait
     }
 
     /**
-     * Returns the specified revisions key value.
+     * Returns the revised value for the specified key.
      *
-     * @param string $valueKey
+     * @param string $key
      *
      * @return mixed
      */
-    public function getRevisedValue($valueKey)
+    public function getRevisedValue($key)
     {
         $model = $this->revisionable;
 
-        $value = $this->$valueKey;
+        $value = $this->{$key};
 
         // Check if the column key is inside the column means property array.
         if($means = $this->getColumnMeans($this->key, $model)) {
@@ -104,7 +104,7 @@ trait RevisionTrait
      *
      * @return bool|string
      */
-    private function getColumnMeans($key, Model $model)
+    protected function getColumnMeans($key, Model $model)
     {
         $columnsMean = $model->getRevisionColumnsMean();
 
@@ -124,39 +124,35 @@ trait RevisionTrait
      *
      * @return mixed
      */
-    private function getColumnMeansProperty($key, $model, $value)
+    protected function getColumnMeansProperty($key, $model, $value)
     {
         // Explode the dot notated key.
         $attributes = explode('.', $key);
 
-        // Assign a temporary object to the specified model.
-        $tmpStr = $model;
-
-        // Go through each attribute.
         foreach ($attributes as $attribute) {
+            // If we're at the end of the attributes array,
+            // we'll see if the temporary object is
+            // an instance of an Eloquent Model.
             if ($attribute === end($attributes)) {
-                // If we're at the end of the attributes array,
-                // we'll see if the temporary object is
-                // an instance of an Eloquent Model.
-                if ($tmpStr instanceof Model) {
-                    if($tmpStr->hasGetMutator($attribute)) {
-                        // If the relationship model has a get mutator
-                        // for the current attrubte, we'll run it
-                        // through the mutator and pass on the
-                        // revisioned value.
-                        $tmpStr = $tmpStr->mutateAttribute($attribute, $value);
-                    } else {
-                        // Looks like the relationship model doesn't
-                        // have a mutator for the attribute, we'll
-                        // return the models attribute.
-                        $tmpStr = $tmpStr->$attribute;
-                    }
+                // If the relationship model has a get mutator
+                // for the current attribute, we'll run it
+                // through the mutator and pass on the
+                // revised value.
+                if($model->hasGetMutator($attribute)) {
+
+                    $model = $model->mutateAttribute($attribute, $value);
+                } else {
+                    // Looks like the relationship model doesn't
+                    // have a mutator for the attribute, we'll
+                    // return the models attribute.
+                    $model = $model->{$attribute};
                 }
+
             } else {
-                $tmpStr = $tmpStr->$attribute;
+                $model = $model->{$attribute};
             }
         }
 
-        return $tmpStr;
+        return $model;
     }
 }
