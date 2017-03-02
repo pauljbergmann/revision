@@ -106,8 +106,14 @@ You **must** insert the `$revisionColumns` property on your model to track revis
 To track all changes on every column on the models database table, use an asterisk like so:
 
 ```php
-class Post extends BaseModel
+use Stevebauman\Revision\Traits\HasRevisionsTrait;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable
 {
+    use Notifiable, HasRevisionsTrait;
+    
     /**
      * The columns to keep revisions of.
      *
@@ -122,8 +128,10 @@ class Post extends BaseModel
 To track changes on specific columns, insert the column names you'd like to track like so:
 
 ```php
-class Post extends BaseModel
-{    
+class User extends Authenticatable
+{
+    use Notifiable, HasRevisionsTrait;
+    
     /**
      * The columns to keep revisions of.
      *
@@ -143,9 +151,9 @@ To display your revisions on a record, call the relationship accessor `revisions
 a regular Laravel relationship, so you can eager load / lazy load your revisions as you please:
 
 ```php
-$post = Post::with('revisions')->find(1);
+$post = User::with('revisions')->find(1);
 
-return view('post.show', ['post' => $post]);
+return view('user.show', ['user' => $user]);
 ```
 
 On each revision record, you can use the following methods to display the revised data:
