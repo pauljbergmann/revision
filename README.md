@@ -33,9 +33,10 @@ Create the `Revision` model and insert the `belongsTo()` or `hasOne()` `user()` 
 ```php
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Stevebauman\Revision\Traits\RevisionTrait;
 
-class Revision extends Eloquent
+class Revision extends Model
 {
     use RevisionTrait;
     
