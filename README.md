@@ -31,7 +31,7 @@ You're all set!
 Create the `Revision` model and insert the `belongsTo()` or `hasOne()` `user()` relationship as well as the `RevisionTrait`:
 
 ```php
-namespace App\Models;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Stevebauman\Revision\Traits\RevisionTrait;
@@ -59,16 +59,19 @@ class Revision extends Model
 }
 ```
 
-Insert the `Stevebauman\Revision\Traits\HasRevisionsTrait` onto your base model:
+Insert the `Stevebauman\Revision\Traits\HasRevisionsTrait` onto your
+model that you'd like to track changes on:
 
 ```php
-namespace App\Models;
+namespace App;
 
 use Stevebauman\Revision\Traits\HasRevisionsTrait;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class BaseModel extends Eloquent
+class User extends Authenticatable
 {
-    use HasRevisionsTrait;
+    use Notifiable, HasRevisionsTrait;
     
     /**
      * The morphMany revisions relationship.
