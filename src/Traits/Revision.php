@@ -4,7 +4,15 @@ namespace Stevebauman\Revision\Traits;
 
 use Illuminate\Database\Eloquent\Model;
 
-trait RevisionTrait
+/**
+ * Trait Revision
+ *
+ * @package Stevebauman\Revision
+ * @version 1.3.0
+ * @author Stevebauman
+ * @author Pauljbergmann
+ */
+trait Revision
 {
     /**
      * The belongsTo user relationship.
@@ -34,6 +42,19 @@ trait RevisionTrait
     }
 
     /**
+     * An alias for getUserResponsible().
+     *
+     * @since 1.3.0
+     *
+     * @uses getUserResponsible()
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->getUserResponsible();
+    }
+
+    /**
      * Returns the revisions column name.
      *
      * @return string
@@ -46,7 +67,7 @@ trait RevisionTrait
 
         $formattedColumns = $model->getRevisionColumnsFormatted();
 
-        if(is_array($formattedColumns) && array_key_exists($column, $formattedColumns)) {
+        if (is_array($formattedColumns) && array_key_exists($column, $formattedColumns)) {
             return $formattedColumns[$column];
         }
 
@@ -86,8 +107,10 @@ trait RevisionTrait
 
         $value = $this->{$key};
 
+        $means = $this->getColumnMeans($this->key, $model);
+
         // Check if the column key is inside the column means property array.
-        if($means = $this->getColumnMeans($this->key, $model)) {
+        if ($means) {
             return $this->getColumnMeansProperty($means, $model, $value);
         }
 
@@ -108,7 +131,7 @@ trait RevisionTrait
     {
         $columnsMean = $model->getRevisionColumnsMean();
 
-        if(is_array($columnsMean) && array_key_exists($key, $columnsMean)) {
+        if (is_array($columnsMean) && array_key_exists($key, $columnsMean)) {
             return $columnsMean[$key];
         }
 
