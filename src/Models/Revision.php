@@ -4,6 +4,7 @@ namespace Stevebauman\Revision\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Stevebauman\Revision\Traits\Revision as RevisionTrait;
+use App\Models\User;
 
 /**
  * Class Revision
@@ -31,6 +32,6 @@ class Revision extends Model
      */
     public function user()
     {
-        return $this->belongsTo(App\User::class, 'created_by', 'id');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }
