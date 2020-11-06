@@ -119,25 +119,15 @@ trait HasRevisions
 
         return $this;
     }
-    
+
     /**
-     * Sets the revision columns to avoid.
+     * Returns the revision columns.
      *
-     * @param array $columns
+     * @todo Clean this spaghetti code!
      *
-     * @return $this
+     * @version 1.3.0
+     * @return array
      */
-    public function setRevisionColumnsToAvoid(array $columns = [])
-    {
-        if (property_exists($this, 'notRevisable')) {
-            // We'll check if the property exists so we don't assign
-            // a non-existent column on the revision model.
-            $this->notRevisable = $columns;
-        }
-
-        return $this;
-    }
-
     protected function getRevisionColumns()
     {
         $notRevisable = is_array($this->notRevisable) ? $this->notRevisable : [];
@@ -149,13 +139,20 @@ trait HasRevisions
         if (count($notRevisable)) {
             return $this->filterColumns($columns, $notRevisable);
         } elseif (count($revisable)) {
-            return $this->filterColumns($columns, []);
+            return $this->filterColumns($columns);
         }
 
-        return $this->filterColumns($columns, []);
+        return $this->filterColumns($columns);
     }
 
-    public function filterColumns(array $columns, array $attributes)
+    /**
+     * Filter the given attributes out of the columns.
+     *
+     * @param array $columns
+     * @param array $attributes
+     * @return array
+     */
+    protected function filterColumns(array $columns, array $attributes = [])
     {
         return array_filter($columns, function($column) use ($attributes) {
             // Do not revise 'updated_at' column.

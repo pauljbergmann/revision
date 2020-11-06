@@ -26,33 +26,14 @@ trait Revision
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function revisionable()
-    {
-        return $this->morphTo();
-    }
+    abstract public function revisionable();
 
     /**
      * Returns the user responsible for the revision.
      *
      * @return mixed
      */
-    public function getUserResponsible()
-    {
-        return $this->user;
-    }
-
-    /**
-     * An alias for getUserResponsible().
-     *
-     * @since 1.3.0
-     *
-     * @uses getUserResponsible()
-     * @return mixed
-     */
-    public function getCreatedBy()
-    {
-        return $this->getUserResponsible();
-    }
+    abstract public function getUserResponsible();
 
     /**
      * Returns the revisions column name.
